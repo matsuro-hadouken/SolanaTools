@@ -1,0 +1,36 @@
+[Unit]
+Description=Solana Service
+After=network.target
+
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=solana1
+
+LimitNOFILE=500000
+
+Environment="SOLANA_METRICS_CONFIG="host=https://metrics.solana.com:8086,db=tds,u=tds_writer,p=dry_run""
+Environment="RUST_LOG=solana=info"
+
+ExecStart=/home/solana/.local/share/solana/install/active_release/bin/solana-validator \
+--ledger /home/solana/validator-ledger \
+--identity /home/solana/key/validator-keypair.json \
+--vote-account /home/solana/key/vote-account-keypair.json \
+--rpc-port 8899 \
+--trusted-validator 5D1fNXzvv5NjV1ysLjirC4WY92RNsVH18vjmcszZd8on \
+--trusted-validator Ft5fbkqNa76vnsjYNwjDZUXoTWpP7VYm3mtsaQckQAD \
+--trusted-validator 9QxCLckBiJc783jnMvXZubK4wH86Eqqvashtrwvcsgkv \
+--entrypoint 35.203.170.30:8001 \
+--dynamic-port-range 8001-8015 \
+--snapshot-interval-slots 6000 \
+--limit-ledger-size \
+--expected-genesis-hash 4uhcVJyU9pJkvQyS88uRDiswHXSCkY3zQawwpjk2NsNY \
+--expected-bank-hash 8osXYbYF7drjZAJedHuwB8A56t7Pwa6bZbtCjiVhJBbT \
+--expected-shred-version 1579 \
+--no-untrusted-rpc \
+--log /home/solana/log/solana-validator.log
+
+[Install]
+WantedBy=multi-user.target
