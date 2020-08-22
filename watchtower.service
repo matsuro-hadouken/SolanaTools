@@ -1,0 +1,15 @@
+[Unit]
+Description=Solana Watchtower
+After=network.target
+
+[Service]
+User=solana
+Type=simple
+Restart=always
+RestartSec=1
+StartLimitInterval=0
+Environment="PATH=/home/solana/.local/share/solana/install/active_release/bin"
+ExecStart=/bin/bash -c "PATH=/home/solana/.local/bin:$PATH exec /home/solana/.local/bin/watchtower.sh >> /home/solana/watchtower.log"
+
+[Install]
+WantedBy=multi-user.target
