@@ -11,31 +11,38 @@
 
 # Solana is complex thing, 'running anything extra on validator side can lead to allot of butt hurt' 
 
-validator="VALIDATOR IDENTITY" # example 'DWvDTSh3qfn88UoQTEKRV2JnLt5jtJAVoiCo3ivtMwXP'
+validator="" # Validator ID
 
-export PATH=$PATH:/usr/local/bin # mandatory path to 'telegram-notify-install.sh' by default /sbin
+HOST_ID="☘ My Super Node ☘"
 
-export PATH="/home/solana/target/1.4.20"/bin:"$PATH" # Path to solana binaries
+PARTITION_NAME="vg-root" # root partition or whatever 'df -h'
+
+export PATH=$PATH:/usr/local/bin # Path to telegram-notify
+
+export PATH=/home/solana/target/bin # Path to solana binary
 
 function BlockProduction() {
 
-    read -r -a arr1 < <(echo $(solana block-production | grep "$validator" | tr -d '%') | cut -d' ' -f2-)
+    read -r -a arr1 < <(echo $(solana block-production --url http://127.0.0.1:8899 | grep "$validator" | tr -d '%') | cut -d' ' -f2-)
 
     leader_slots="${arr1[0]}"
     blocks_produced="${arr1[1]}"
     skipped_slots="${arr1[2]}"
     skipped_slot_precentage="${arr1[3]} %"
 
+    echo "$HOST_ID" >>"$TMP_FILE" && echo >>"$TMP_FILE"
+    echo "➡️️ Skip rate: $skipped_slot_precentage" >>"$TMP_FILE"
+    echo >>"$TMP_FILE"
+
     echo "Leader slots: $leader_slots" >>"$TMP_FILE"
     echo "Produced blocks: $blocks_produced" >>"$TMP_FILE"
     echo "Skipped slots: $skipped_slots" >>"$TMP_FILE"
-    echo "Skip rate: $skipped_slot_precentage" >>"$TMP_FILE"
     echo >>"$TMP_FILE"
 }
 
 function DiskSpace() {
 
-    read -r -a arr2 < <(df -BG | grep "vg0-lv--0" | cut -d' ' -f2-)
+    read -r -a arr2 < <(df -BG | grep "$PARTITION_NAME" | cut -d' ' -f2-)
 
     disk_used="${arr2[1]}"
     disk_available="${arr2[2]}"
@@ -74,8 +81,6 @@ time_stamp=$(date "+%Y.%m.%d-%H:%M:%S %Z")
 
 echo "$time_stamp" >"$TMP_FILE" && echo >>"$TMP_FILE"
 
-echo "▪️ block »" >>"$TMP_FILE" && echo >>"$TMP_FILE"
-
 BlockProduction
 
 echo "▪️ disk »" >>"$TMP_FILE" && echo >>"$TMP_FILE"
@@ -86,4 +91,4 @@ echo "▪️ memory »" >>"$TMP_FILE" && echo >>"$TMP_FILE"
 
 MemoryUsage
 
-telegram-notify --success --text "Report:" --file "$TMP_FILE"
+telegram-notify --success --text "Report:" --file "$TMP_FILE" # thie need telegram-notify
